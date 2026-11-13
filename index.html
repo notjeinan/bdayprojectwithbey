@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Digital Birthday Party</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#FFA24A;--hero:linear-gradient(160deg,#7048C8 0%,#4B2A98 100%);--p:#5B38B0;--s:#F2650A;--accent:#F2650A;--a1:#FFA24A;--soft:#FFE3C4;--card:#fff;--ink:#2B0F4F;--mute:#6a5882;--pageink:#2B0F4F;--h:#3F1D7A;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-char="jeinan"]{--bg:#FFD3E3;--hero:#9E1030;--p:#9E1030;--s:#FF7FAE;--accent:#E8457F;--a1:#FF7FAE;--soft:#FFE9F1;--ink:#4A0A1A;--mute:#8a5565;--pageink:#4A0A1A;--h:#9E1030}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;font-family:'Fredoka',system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
+.hidden{display:none!important}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:#3b1a5c}
+.modal{background:#fff;border-radius:28px;padding:28px 22px;max-width:420px;width:100%;text-align:center;color:#2B0F4F}
+.modal h1{margin:0 0 4px;font-size:30px}
+.modal h1 .ic{width:1.1em;height:1.1em;vertical-align:-.18em;margin-left:8px}
+.modal p{margin:0 0 20px;color:#6f5a86}
+.choices{display:flex;gap:14px}
+.choice{flex:1;border:0;border-radius:22px;padding:16px 8px;cursor:pointer;font:inherit;font-weight:600;font-size:18px;color:#fff;transition:transform .2s}
+.choice:hover{transform:translateY(-4px)}
+.choice.bey{background:#F2650A}
+.choice.jeinan{background:#E0457F}
+.av{width:84px;height:84px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:34px;font-weight:700;color:var(--p);border:4px solid #fff}
+.choice.bey .av{color:#F2650A}.choice.jeinan .av{color:#E0457F}
+.loader{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--hero);color:#fff;text-align:center;padding:20px}
+.loader .av{width:110px;height:110px;animation:bounce 1s infinite}
+@keyframes bounce{50%{transform:translateY(-18px) rotate(6deg)}}
+.bar{width:min(280px,70vw);height:12px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width 4.5s linear}
+main{max-width:640px;margin:0 auto;padding:0 18px 60px}
+.hero{margin:0 -18px;padding:44px 24px 52px;text-align:center;color:#fff;background:var(--hero);border-radius:0 0 40px 40px}
+.hero .av{width:110px;height:110px;margin-bottom:14px}
+.hero h1{margin:0;font-size:42px}
+.hero p{margin:8px 0 0;font-size:18px}
+.badge{display:inline-block;margin-top:16px;padding:6px 16px;border-radius:99px;background:var(--accent);color:#fff;font-weight:600;font-size:14px}
+.badge{background:var(--bg);color:var(--h)}
+h2{font-size:26px;margin:40px 0 4px;color:var(--h)}
+.sub{color:var(--pageink);opacity:.8;margin:0 0 18px}
+.tl{display:flex;flex-direction:column;gap:14px}
+.note{margin:16px 0 0;padding:18px 20px;border-radius:22px;background:var(--soft);color:var(--ink);text-align:left}
+.note b{display:block;font-size:19px;color:var(--h);margin-bottom:6px}
+.note span.txt{display:block;font-size:14.5px;line-height:1.6;color:var(--mute)}
+.item{display:flex;gap:14px;background:var(--card);border-radius:22px;padding:16px}
+.ico{font-size:30px;width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--soft);flex:none}
+.item b{font-size:18px}.item small{display:block;color:var(--mute);margin-top:2px}
+.time{font-size:13px;font-weight:600;color:var(--p)}
+.ic{display:inline-flex;align-items:center;justify-content:center}.ic img{max-width:100%;max-height:100%;object-fit:contain}
+h2 .ic{width:1.1em;height:1.1em;vertical-align:-.18em;margin-right:8px}
+.ico .ic{width:40px;height:40px}
+.ny .ic,.done .ic{width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:8px}
+.card{background:var(--card);border-radius:26px;padding:20px}
+.item,.card{box-shadow:0 8px 20px rgba(60,25,120,.10)}
+.cal-h{display:flex;justify-content:space-between;font-weight:600;font-size:17px;margin-bottom:10px;gap:8px}
+.cal-h span:last-child{color:var(--mute);font-size:14px;font-weight:500}
+.tz{display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:99px;background:var(--soft);font-size:13px;font-weight:600;color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.dow{font-size:12px;color:var(--mute);font-weight:600}
+.d{aspect-ratio:1;border:0;border-radius:14px;font:inherit;font-weight:500;background:transparent;color:var(--mute);opacity:.35}
+.d.on{opacity:1;background:var(--soft);color:var(--ink);cursor:pointer;font-weight:600}
+.d.on:hover{background:var(--s);color:#fff}
+.d.sel,.d.sel:hover{background:var(--p);color:#fff;transform:scale(1.08)}
+.chips{display:flex;gap:10px;margin-top:16px}
+.chip{flex:1;padding:14px 6px;border-radius:18px;border:2px solid var(--p);background:transparent;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.chip.sel{background:var(--p);color:#fff}
+.ny{margin-top:14px;padding:12px 14px;border-radius:16px;background:var(--soft);font-size:15px}
+.ny b{color:var(--p)}
+.cta{width:100%;margin-top:18px;padding:16px;border:0;border-radius:20px;font:inherit;font-weight:700;font-size:18px;color:#fff;background:var(--p);cursor:pointer}
+.cta:disabled{opacity:.35;cursor:not-allowed}
+.done{margin-top:16px;padding:16px;border-radius:18px;background:var(--accent);color:#fff;text-align:center;font-weight:600}
+textarea{width:100%;margin-top:14px;padding:12px 14px;border-radius:16px;border:2px solid var(--soft);background:#fff;font:inherit;font-size:15px;color:var(--ink);resize:none;outline:none}
+textarea:focus{border-color:var(--p)}
+.thread{display:flex;flex-direction:column;gap:14px;max-height:480px;overflow-y:auto;padding:2px}
+.empty{text-align:center;color:var(--mute);font-size:14.5px;padding:18px 8px}
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:92%}
+.msg.own{flex-direction:row-reverse;align-self:flex-end}
+.av.sm{width:38px;height:38px;margin:0;font-size:16px;border:2px solid var(--soft);flex:none}
+.bub{background:var(--soft);border-radius:20px 20px 20px 6px;padding:10px 14px;color:var(--ink);font-size:15px;min-width:0}
+.msg.own .bub{background:var(--p);color:#fff;border-radius:20px 20px 6px 20px}
+.bub small{display:block;font-size:12px;font-weight:600;opacity:.75;margin-bottom:3px}
+.what{font-weight:600}
+.what em{font-style:normal;font-weight:500;opacity:.7}
+.tb{margin-top:8px;display:grid;gap:6px}
+.tb div{background:rgba(255,255,255,.8);color:var(--ink);border-radius:12px;padding:7px 10px;text-align:left}
+.tb .lb{display:block;font-size:11.5px;font-weight:600;color:var(--mute)}
+.tb b{font-size:14.5px;font-weight:600}
+.nt{margin-top:8px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.msg.dim .bub{opacity:.55}
+.conf{align-self:stretch;background:var(--accent);color:#fff;border-radius:20px;padding:14px 16px;text-align:center}
+.conf b{font-size:19px}
+.reply{margin-top:16px;padding-top:14px;border-top:2px dashed var(--soft)}
+.hint{font-size:14px;color:var(--mute);text-align:center}
+.reply textarea{margin-top:10px}
+.rbtns{display:flex;gap:10px;flex-wrap:wrap}
+.rbtns .cta{flex:1 1 140px;margin-top:12px;padding:12px;font-size:16px}
+.rm{display:block;margin:6px 0 0 auto;padding:4px 2px;border:0;background:none;color:inherit;font:inherit;font-size:11.5px;font-weight:500;opacity:.65;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.rm:hover{opacity:1}
+.rm:disabled{opacity:.35;cursor:not-allowed}
+.cta.sec{background:transparent;color:var(--p);border:2px solid var(--p)}
+#approve{background:var(--accent)}
+footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="pick">
+  <div class="modal">
+    <h1>Who is this?<span class="ic" data-src="https://i.imgur.com/DACoAiH.png" data-fb=""></span></h1>
+    <p>Pick one so we know who just opened the invite</p>
+    <div class="choices">
+      <button class="choice bey" data-c="bey"><span class="av" data-src="https://i.imgur.com/dF4Tj3T.png" data-n="B"></span>Bey</button>
+      <button class="choice jeinan" data-c="jeinan"><span class="av" data-src="https://i.imgur.com/XsoUXR0.png" data-n="J"></span>Jeinan</button>
+    </div>
+  </div>
+</div>
+
+<div class="loader hidden" id="loader">
+  <span class="av" id="lav"></span>
+  <h2 style="margin:0;color:#fff" id="lmsg">Setting up the party…</h2>
+  <div class="bar"><i id="lbar"></i></div>
+</div>
+
+<main class="hidden" id="app">
+  <section class="hero">
+    <span class="av" id="hav"></span>
+    <h1 id="hi">Hi!</h1>
+    <p>You’re invited to a Digital Birthday Party</p>
+    <span class="badge">2 Hours · Online</span>
+  </section>
+
+  <h2><span class="ic" data-src="https://i.imgur.com/XUpEnbJ.png" data-fb=""></span>Rundown</h2>
+  <p class="sub">Two hours of pure fun</p>
+  <div class="tl">
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/qROUOim.png" data-fb=""></span></div><div><span class="time">Session 1 · 30 min</span><br><b>Mini Games</b><small>Friendly competition, get ready!</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/dF4Tj3T.png" data-fb="B"></span></div><div><span class="time">Session 2 · 25 min</span><br><b>Bey’s Life Update</b><small>The latest stories from Bey</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/J6VmxVW.png" data-fb=""></span></div><div><span class="time">Session 3 · 40 min</span><br><b>Astrology Reading for Bey</b><small>A 1-year reading, my birthday present to you</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/XsoUXR0.png" data-fb="J"></span></div><div><span class="time">Session 4 · 25 min</span><br><b>Jeinan’s Life Update</b><small>The latest stories from Jeinan</small></div></div>
+  </div>
+  <div class="note" role="note">
+    <b>Time may stretch</b>
+    <span class="txt">The timings above are a rough guide. If we’re having too much fun, a session might run a little longer, so please keep some extra time free.</span>
+  </div>
+
+  <h2 id="calendar"><span class="ic" data-src="https://i.imgur.com/VrpkXOd.png" data-fb=""></span>Calendar</h2>
+  <p class="sub">Pick the date and time that works best for you</p>
+  <div class="card">
+    <span class="tz" id="tz"></span>
+    <div class="cal-h"><span>November 2026</span><span id="range"></span></div>
+    <div class="grid" id="cal"></div>
+    <div id="timeWrap" class="hidden">
+      <div class="chips" id="chips"></div>
+      <div class="ny hidden" id="ny"></div>
+      <textarea id="pnote" rows="2" maxlength="300" placeholder="Add a note (optional)"></textarea>
+    </div>
+    <button class="cta" id="save" disabled>Propose this time</button>
+  </div>
+
+  <h2><span class="ic" data-src="https://i.imgur.com/lN2Cyvq.png" data-fb=""></span>Discussion</h2>
+  <p class="sub" id="chatsub">Propose a time, approve it, or suggest another one</p>
+  <div class="card">
+    <div id="thread" class="thread"></div>
+    <div class="reply">
+      <div class="hint" id="hint"></div>
+      <textarea id="rnote" rows="2" maxlength="300" placeholder="Write a note…"></textarea>
+      <div class="rbtns">
+        <button class="cta sec" id="send" disabled>Send note</button>
+        <button class="cta hidden" id="approve">Approve</button>
+        <button class="cta sec" id="newtime">Propose New Time</button>
+      </div>
+    </div>
+  </div>
+  <footer>Made with love and my bare hands and some of milk tea. See you at the party!</footer>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const NAMES={bey:'Bey',jeinan:'Jeinan'};
+const SRC={bey:'https://i.imgur.com/dF4Tj3T.png',jeinan:'https://i.imgur.com/XsoUXR0.png'};
+// Offered slots are fixed in Jakarta time: 07:00 and 08:00 WIB (= 00:00 / 01:00 UTC)
+const UTC_H=[0,1];
+const CFG={
+  bey:{tz:'America/New_York',name:'New York time (EST)',labels:['7:00 PM EST','8:00 PM EST'],
+       otherTz:'Asia/Jakarta',otherName:'Jakarta',otherSuffix:'WIB',h12:false,otherIcon:'https://i.imgur.com/bxAoW9n.png'},
+  jeinan:{tz:'Asia/Jakarta',name:'Jakarta time (WIB)',labels:['07:00 WIB','08:00 WIB'],
+       otherTz:'America/New_York',otherName:'New York',otherSuffix:'EST',h12:true,otherIcon:'https://i.imgur.com/fzJR7Qs.png'}
+};
+let state={who:null,day:null,slot:null,avail:{}};
+
+function avatar(el,src,n){
+  el.textContent='';
+  const img=new Image();img.alt=n;img.style.cssText='width:100%;height:100%;border-radius:50%;object-fit:cover';
+  img.onerror=()=>{img.remove();el.textContent=n};
+  img.src=src;el.appendChild(img);
+}
+document.querySelectorAll('.av[data-src]').forEach(e=>avatar(e,e.dataset.src,e.dataset.n));
+function icon(src,fb){const s=document.createElement('span');s.className='ic';const img=new Image();img.alt='';img.onerror=()=>{img.remove();s.textContent=fb};img.src=src;s.appendChild(img);return s}
+function initIcons(root){root.querySelectorAll('.ic[data-src]').forEach(e=>e.replaceWith(icon(e.dataset.src,e.dataset.fb)))}
+initIcons(document);
+
+document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+  const c=b.dataset.c;state.who=c;
+  document.documentElement.setAttribute('data-char',c);
+  $('#pick').classList.add('hidden');
+  const L=$('#loader');L.classList.remove('hidden');
+  avatar($('#lav'),SRC[c],NAMES[c][0]);
+  const msgs=['Setting up the party…','Blowing up balloons…','Placing the cake…','Almost ready!'];let i=0;
+  const t=setInterval(()=>{i=(i+1)%msgs.length;$('#lmsg').textContent=msgs[i]},1100);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('#lbar').style.width='100%'));
+  setTimeout(()=>{clearInterval(t);L.classList.add('hidden');enter(c)},4600);
+});
+
+function enter(c){
+  $('#hi').textContent='Hi, '+NAMES[c]+'!';
+  avatar($('#hav'),SRC[c],NAMES[c][0]);
+  $('#app').classList.remove('hidden');
+  window.scrollTo(0,0);
+  buildCal();
+  startChat();
+}
+
+function dayIn(tz,dt){return +new Intl.DateTimeFormat('en-US',{timeZone:tz,day:'numeric'}).format(dt)}
+
+function buildCal(){
+  const cfg=CFG[state.who];
+  // Jakarta dates 16-30 Nov, mapped to the viewer's own calendar day
+  state.avail={};
+  for(let jd=16;jd<=30;jd++) state.avail[dayIn(cfg.tz,new Date(Date.UTC(2026,10,jd,UTC_H[0])))]=jd;
+  const days=Object.keys(state.avail).map(Number);
+  $('#tz').textContent='Showing '+cfg.name;
+  $('#range').textContent='Nov '+Math.min(...days)+' – '+Math.max(...days)+' available';
+  const g=$('#cal');g.innerHTML='';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>g.insertAdjacentHTML('beforeend','<div class="dow">'+d+'</div>'));
+  const offset=new Date(2026,10,1).getDay();
+  for(let i=0;i<offset;i++)g.insertAdjacentHTML('beforeend','<div></div>');
+  for(let d=1;d<=30;d++){
+    const ok=d in state.avail;
+    const b=document.createElement('button');b.textContent=d;b.className='d'+(ok?' on':'');b.disabled=!ok;
+    if(ok)b.onclick=()=>{state.day=d;state.slot=null;
+      g.querySelectorAll('.d').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');showTimes();};
+    g.appendChild(b);
+  }
+}
+
+function showTimes(){
+  const cfg=CFG[state.who];
+  $('#timeWrap').classList.remove('hidden');$('#ny').classList.add('hidden');
+  $('#save').disabled=true;
+  const c=$('#chips');c.innerHTML='';
+  cfg.labels.forEach((lab,i)=>{
+    const b=document.createElement('button');b.className='chip';b.textContent=lab;
+    b.onclick=()=>{state.slot=i;c.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
+      const dt=new Date(Date.UTC(2026,10,state.avail[state.day],UTC_H[i]));
+      const txt=new Intl.DateTimeFormat('en-US',{timeZone:cfg.otherTz,weekday:'short',month:'short',day:'numeric',hour:cfg.h12?'numeric':'2-digit',minute:'2-digit',hour12:cfg.h12}).format(dt);
+      const n=$('#ny');n.innerHTML='<span class="ic" data-src="'+cfg.otherIcon+'" data-fb=""></span>'+cfg.otherName+' time ('+cfg.otherSuffix+'): <b>'+txt+'</b>';initIcons(n);n.classList.remove('hidden');
+      $('#save').disabled=false;};
+    c.appendChild(b);
+  });
+}
+
+// ================= Discussion =================
+// Firebase Realtime Database URL, e.g. 'https://YOUR-PROJECT-default-rtdb.firebaseio.com'
+// Leave empty = demo mode (messages saved only in this browser).
+const DB_URL='';
+const PATH='bday/chat';
+const store={
+  async load(){
+    if(DB_URL){
+      const r=await fetch(DB_URL+'/'+PATH+'.json');const o=(await r.json())||{};
+      return Object.entries(o).map(([id,m])=>({...m,id})).sort((a,b)=>a.ts-b.ts);
+    }
+    try{return JSON.parse(localStorage.getItem('bday-chat')||'[]')}catch(e){return[]}
+  },
+  async add(m){
+    if(DB_URL){
+      const r=await fetch(DB_URL+'/'+PATH+'.json',{method:'POST',body:JSON.stringify(m)});
+      if(!r.ok)throw new Error('write failed');return;
+    }
+    const a=await this.load();a.push({...m,id:'l'+m.ts});
+    try{localStorage.setItem('bday-chat',JSON.stringify(a))}catch(e){}
+  },
+  async remove(id){
+    if(DB_URL){
+      const r=await fetch(DB_URL+'/'+PATH+'/'+encodeURIComponent(id)+'.json',{method:'DELETE'});
+      if(!r.ok)throw new Error('delete failed');return;
+    }
+    const a=(await this.load()).filter(x=>x.id!==id);
+    try{localStorage.setItem('bday-chat',JSON.stringify(a))}catch(e){}
+  }
+};
+let msgs=[],lastSig=null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function fmt(tz,dt,h12,suf){
+  const d=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric'}).format(dt);
+  const t=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:h12?'numeric':'2-digit',minute:'2-digit',hour12:h12}).format(dt);
+  return d+' · '+t+' '+suf;
+}
+function timeBlock(iso){
+  const dt=new Date(iso);
+  return '<div class="tb"><div><span class="lb">New York</span><b>'+fmt('America/New_York',dt,true,'EST')+'</b></div>'
+    +'<div><span class="lb">Jakarta</span><b>'+fmt('Asia/Jakarta',dt,false,'WIB')+'</b></div></div>';
+}
+function status(){
+  let last=null;
+  for(const m of msgs) if(m.type==='propose'||m.type==='accept') last=m;
+  if(!last) return {kind:'none'};
+  if(last.type==='accept') return {kind:'ok',p:msgs.find(x=>x.id===last.ref)};
+  return {kind:'pending',p:last};
+}
+function syncButtons(){
+  const st=status();const other=state.who==='bey'?'jeinan':'bey';
+  const canApprove=st.kind==='pending'&&st.p.who!==state.who;
+  $('#approve').classList.toggle('hidden',!canApprove);
+  $('#approve').disabled=false;
+  $('#save').textContent=canApprove?'Suggest this time instead':'Propose this time';
+  $('#save').disabled=state.slot==null;
+  $('#send').disabled=!$('#rnote').value.trim();
+  let t;
+  if(st.kind==='none')t='No proposal yet. Pick a date & time above';
+  else if(st.kind==='ok')t='All set! Want to change it? Pick a new time above.';
+  else if(canApprove)t=NAMES[st.p.who]+' proposed a time. Approve it, or pick another time above.';
+  else t='Waiting for '+NAMES[other]+' to respond…';
+  $('#hint').textContent=t;
+}
+function render(){
+  const st=status();
+  const liveId=(st.kind!=='none'&&st.p)?st.p.id:null;
+  let h='';
+  if(!msgs.length)h='<div class="empty">No proposals yet. Pick a date &amp; time above, then hit propose</div>';
+  for(const m of msgs){
+    const own=m.who===state.who,nm=NAMES[m.who]||'?';
+    let body='',dim=false;
+    if(m.type==='propose'){
+      dim=m.id!==liveId;
+      body='<div class="what">proposed a time'+(dim?' <em>(replaced)</em>':'')+'</div>'+timeBlock(m.startUtc);
+    }else if(m.type==='accept'){
+      body='<div class="what">Approved!</div>';
+    }
+    if(m.note)body+='<div class="nt">'+esc(m.note)+'</div>';
+    h+='<div class="msg'+(own?' own':'')+(dim?' dim':'')+'"><span class="av sm" data-src="'+SRC[m.who]+'" data-n="'+nm[0]+'"></span><div class="bub"><small>'+nm+'</small>'+body+(own?'<button class="rm" data-id="'+esc(m.id)+'">Remove</button>':'')+'</div></div>';
+  }
+  if(st.kind==='ok'&&st.p)h+='<div class="conf"><b>Confirmed</b>'+timeBlock(st.p.startUtc)+'<div style="margin-top:8px">See you at the party!</div></div>';
+  const th=$('#thread');
+  const atBottom=th.scrollHeight-th.scrollTop-th.clientHeight<60;
+  th.innerHTML=h;
+  th.querySelectorAll('.av[data-src]').forEach(e=>avatar(e,e.dataset.src,e.dataset.n));
+  if(atBottom||lastSig===null)th.scrollTop=th.scrollHeight;
+}
+async function refresh(){
+  try{
+    msgs=await store.load();
+    const sig=msgs.map(m=>m.id).join(',');
+    if(sig!==lastSig){render();lastSig=sig}
+  }catch(e){$('#hint').textContent='Can’t reach the server, retrying…';return}
+  syncButtons();
+}
+async function post(m){
+  document.querySelectorAll('#save,#approve,#send').forEach(x=>x.disabled=true);
+  try{await store.add({...m,who:state.who,ts:Date.now()})}catch(e){alert('Could not send, please try again')}
+  await refresh();
+}
+function startChat(){
+  if(!DB_URL)$('#chatsub').textContent+=' (demo mode: saved on this device only)';
+  $('#rnote').oninput=syncButtons;
+  refresh();
+  setInterval(()=>{if(!document.hidden)refresh()},3000);
+}
+$('#save').onclick=async()=>{
+  const utc=new Date(Date.UTC(2026,10,state.avail[state.day],UTC_H[state.slot])).toISOString();
+  await post({type:'propose',startUtc:utc,note:$('#pnote').value.trim()});
+  $('#pnote').value='';state.slot=null;
+  $('#chips').querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+  $('#ny').classList.add('hidden');
+  syncButtons();
+};
+$('#approve').onclick=async()=>{
+  const st=status();if(st.kind!=='pending')return;
+  await post({type:'accept',ref:st.p.id,note:$('#rnote').value.trim()});
+  $('#rnote').value='';syncButtons();
+};
+$('#thread').onclick=async e=>{
+  const b=e.target.closest('.rm');if(!b)return;
+  const id=b.dataset.id,m=msgs.find(x=>x.id===id);
+  if(!m||m.who!==state.who)return;
+  b.disabled=true;
+  try{
+    await store.remove(id);
+    if(m.type==='propose'){for(const x of msgs)if(x.type==='accept'&&x.ref===id)await store.remove(x.id)}
+  }catch(err){alert('Could not remove, please try again')}
+  await refresh();
+};
+$('#newtime').onclick=()=>{$('#calendar').scrollIntoView({behavior:'smooth',block:'start'})};
+$('#send').onclick=async()=>{
+  const note=$('#rnote').value.trim();if(!note)return;
+  await post({type:'note',note});
+  $('#rnote').value='';syncButtons();
+};
+</script>
+</body>
+</html>

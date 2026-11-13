@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5B38B0" id="themeColor">
 <title>Digital Birthday Party</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/XUpEnbJ.png">
+<link rel="apple-touch-icon" href="https://i.imgur.com/XUpEnbJ.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--bg:#FFA24A;--hero:linear-gradient(160deg,#7048C8 0%,#4B2A98 100%);--p:#5B38B0;--s:#F2650A;--accent:#F2650A;--a1:#FFA24A;--soft:#FFE3C4;--card:#fff;--ink:#2B0F4F;--mute:#6a5882;--pageink:#2B0F4F;--h:#3F1D7A;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-:root[data-char="jeinan"]{--bg:#FFD3E3;--hero:#9E1030;--p:#9E1030;--s:#FF7FAE;--accent:#E8457F;--a1:#FF7FAE;--soft:#FFE9F1;--ink:#4A0A1A;--mute:#8a5565;--pageink:#4A0A1A;--h:#9E1030}
+:root{color-scheme:light;--bg:#FFA24A;--top:#7048C8;--hero:linear-gradient(160deg,#7048C8 0%,#4B2A98 100%);--p:#5B38B0;--s:#F2650A;--accent:#F2650A;--a1:#FFA24A;--soft:#FFE3C4;--card:#fff;--ink:#2B0F4F;--mute:#6a5882;--pageink:#2B0F4F;--h:#3F1D7A;box-sizing:border-box}
+:root[data-char="jeinan"]{--bg:#FFD3E3;--top:#9E1030;--hero:#9E1030;--p:#9E1030;--s:#FF7FAE;--accent:#E8457F;--a1:#FF7FAE;--soft:#FFE9F1;--ink:#4A0A1A;--mute:#8a5565;--pageink:#4A0A1A;--h:#9E1030}
 *,*:before,*:after{box-sizing:inherit}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{margin:0;font-family:'Fredoka',system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
+html{scroll-behavior:smooth;background:var(--bg) linear-gradient(var(--top),var(--top)) no-repeat top/100% 320px;min-height:100%}
+body{margin:0;font-family:'Fredoka',system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;min-height:100vh}
 .hidden{display:none!important}
-.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:#3b1a5c}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));background:#3b1a5c}
 .modal{background:#fff;border-radius:28px;padding:28px 22px;max-width:420px;width:100%;text-align:center;color:#2B0F4F}
 .modal h1{margin:0 0 4px;font-size:30px}
 .modal h1 .ic{width:1.1em;height:1.1em;vertical-align:-.18em;margin-left:8px}
@@ -24,13 +27,13 @@ body{margin:0;font-family:'Fredoka',system-ui,sans-serif;background:var(--bg);co
 .choice.jeinan{background:#E0457F}
 .av{width:84px;height:84px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:34px;font-weight:700;color:var(--p);border:4px solid #fff}
 .choice.bey .av{color:#F2650A}.choice.jeinan .av{color:#E0457F}
-.loader{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--hero);color:#fff;text-align:center;padding:20px}
+.loader{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--hero);color:#fff;text-align:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px))}
 .loader .av{width:110px;height:110px;animation:bounce 1s infinite}
 @keyframes bounce{50%{transform:translateY(-18px) rotate(6deg)}}
 .bar{width:min(280px,70vw);height:12px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width 4.5s linear}
-main{max-width:640px;margin:0 auto;padding:0 18px 60px}
-.hero{margin:0 -18px;padding:44px 24px 52px;text-align:center;color:#fff;background:var(--hero);border-radius:0 0 40px 40px}
+main{max-width:640px;margin:0 auto;padding:0 18px calc(60px + env(safe-area-inset-bottom,0px))}
+.hero{margin:0 -18px;padding:calc(44px + env(safe-area-inset-top,0px)) 24px 52px;text-align:center;color:#fff;background:var(--hero);border-radius:0 0 40px 40px}
 .hero .av{width:110px;height:110px;margin-bottom:14px}
 .hero h1{margin:0;font-size:42px}
 .hero p{margin:8px 0 0;font-size:18px}
@@ -166,7 +169,7 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
       <div class="rbtns">
         <button class="cta sec" id="send" disabled>Send note</button>
         <button class="cta hidden" id="approve">Approve</button>
-        <button class="cta sec" id="newtime">Propose New Time</button>
+        <button class="cta sec" id="newtime">Propose new time</button>
       </div>
     </div>
   </div>
@@ -201,6 +204,8 @@ initIcons(document);
 document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
   const c=b.dataset.c;state.who=c;
   document.documentElement.setAttribute('data-char',c);
+  // Make the iPhone status bar area match the hero colour
+  $('#themeColor').setAttribute('content',c==='jeinan'?'#9E1030':'#7048C8');
   $('#pick').classList.add('hidden');
   const L=$('#loader');L.classList.remove('hidden');
   avatar($('#lav'),SRC[c],NAMES[c][0]);
@@ -316,7 +321,7 @@ function syncButtons(){
   $('#save').disabled=state.slot==null;
   $('#send').disabled=!$('#rnote').value.trim();
   let t;
-  if(st.kind==='none')t='No proposal yet. Pick a date & time above';
+  if(st.kind==='none')t='';
   else if(st.kind==='ok')t='All set! Want to change it? Pick a new time above.';
   else if(canApprove)t=NAMES[st.p.who]+' proposed a time. Approve it, or pick another time above.';
   else t='Waiting for '+NAMES[other]+' to respond…';

@@ -57,8 +57,10 @@ h2 .ic{width:1.1em;height:1.1em;vertical-align:-.18em;margin-right:8px}
 .ny .ic,.done .ic{width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:8px}
 .card{background:var(--card);border-radius:26px;padding:20px}
 .item,.card{box-shadow:0 8px 20px rgba(60,25,120,.10)}
-.cal-h{display:flex;justify-content:space-between;font-weight:600;font-size:17px;margin-bottom:10px;gap:8px}
-.cal-h span:last-child{color:var(--mute);font-size:14px;font-weight:500}
+.cal-h{display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:18px;margin-bottom:6px;gap:8px}
+.nav{width:38px;height:38px;border:0;border-radius:50%;background:var(--soft);color:var(--p);font:inherit;font-size:22px;font-weight:700;line-height:1;cursor:pointer}
+.nav:disabled{opacity:.3;cursor:not-allowed}
+.range{text-align:center;color:var(--mute);font-size:13.5px;margin-bottom:12px}
 .tz{display:inline-block;margin-bottom:12px;padding:4px 12px;border-radius:99px;background:var(--soft);font-size:13px;font-weight:600;color:var(--p)}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
 .dow{font-size:12px;color:var(--mute);font-weight:600}
@@ -137,10 +139,10 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
   <h2>Rundown</h2>
   <p class="sub">Two hours of pure fun</p>
   <div class="tl">
-    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/qROUOim.png" data-fb=""></span></div><div><span class="time">Session 1 · 10 min</span><br><b>Mini Games</b><small>Friendly competition, get ready!</small></div></div>
-    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/dF4Tj3T.png" data-fb="B"></span></div><div><span class="time">Session 2 · 35 min</span><br><b>Bey’s Life Update</b><small>The latest stories from Bey</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/qROUOim.png" data-fb=""></span></div><div><span class="time">Session 1 · 30 min</span><br><b>Mini Games</b><small>Friendly competition, get ready!</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/dF4Tj3T.png" data-fb="B"></span></div><div><span class="time">Session 2 · 25 min</span><br><b>Bey’s Life Update</b><small>The latest stories from Bey</small></div></div>
     <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/J6VmxVW.png" data-fb=""></span></div><div><span class="time">Session 3 · 40 min</span><br><b>Astrology Reading for Bey</b><small>A 1-year reading, my birthday present to you</small></div></div>
-    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/XsoUXR0.png" data-fb="J"></span></div><div><span class="time">Session 4 · 35 min</span><br><b>Jeinan’s Life Update</b><small>The latest stories from Jeinan</small></div></div>
+    <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/XsoUXR0.png" data-fb="J"></span></div><div><span class="time">Session 4 · 25 min</span><br><b>Jeinan’s Life Update</b><small>The latest stories from Jeinan</small></div></div>
   </div>
   <div class="note" role="note">
     <b>Time may stretch</b>
@@ -151,7 +153,8 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
   <p class="sub">Pick the date and time that works best for you</p>
   <div class="card">
     <span class="tz" id="tz"></span>
-    <div class="cal-h"><span>November 2026</span><span id="range"></span></div>
+    <div class="cal-h"><button class="nav" id="prev" aria-label="Previous month">‹</button><span id="mtitle"></span><button class="nav" id="next" aria-label="Next month">›</button></div>
+    <div class="range" id="range"></div>
     <div class="grid" id="cal"></div>
     <div id="timeWrap" class="hidden">
       <div class="chips" id="chips"></div>
@@ -236,37 +239,65 @@ function tod(tz,ms,h12){
   if(h12)o.hour12=true;else{o.hour12=false;o.hourCycle='h23'}
   return new Intl.DateTimeFormat('en-US',o).format(new Date(ms));
 }
-// Time range of a 2-hour slot, e.g. "08:00 – 10:00 WITA"
-function rng(tz,ms,h12,suf){return tod(tz,ms,h12)+' – '+tod(tz,ms+7200000,h12)+' '+suf}
+// Time range of a 2-hour slot, e.g. "08:00 - 10:00 WITA"
+function rng(tz,ms,h12,suf){return tod(tz,ms,h12)+' - '+tod(tz,ms+7200000,h12)+' '+suf}
+
+const MONTHS=[[2026,10],[2026,11],[2027,0]];
+const MNAME=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MSHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const p2=n=>String(n).padStart(2,'0');
+function dkey(tz,ms){return new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms))}
 
 function buildCal(){
   const cfg=CFG[state.who];
-  // Build every slot (WITA blocks), keep only the ones that are still in the future,
-  // then group them by the viewer's own calendar day.
+  // Build every slot (WITA blocks) from Nov 2026 to Jan 2027, keep only future ones,
+  // then group them by the viewer's own calendar date.
   state.avail={};
   const now=Date.now();
-  for(let jd=1;jd<=30;jd++){
-    const dow=new Date(Date.UTC(2026,10,jd)).getUTCDay();
+  for(let n=0;n<92;n++){
+    const dow=new Date(Date.UTC(2026,10,1+n)).getUTCDay();
     const hours=(dow===0||dow===6)?HOURS_WEEKEND:HOURS_WEEKDAY;
     for(const h of hours){
-      const ms=Date.UTC(2026,10,jd,h-WITA_OFFSET);
+      const ms=Date.UTC(2026,10,1+n,h-WITA_OFFSET);
       if(ms<=now)continue;
-      const d=dayIn(cfg.tz,new Date(ms));
-      (state.avail[d]=state.avail[d]||[]).push(ms);
+      const k=dkey(cfg.tz,ms);
+      (state.avail[k]=state.avail[k]||[]).push(ms);
     }
   }
   for(const k in state.avail)state.avail[k].sort((a,b)=>a-b);
-  const days=Object.keys(state.avail).map(Number);
   $('#tz').textContent='Showing '+cfg.name;
-  $('#range').textContent=days.length?('Nov '+Math.min(...days)+' – '+Math.max(...days)+' available'):'No dates available';
+  const keys=Object.keys(state.avail).sort();
+  const fmtK=k=>{const [y,m,d]=k.split('-').map(Number);return MSHORT[m-1]+' '+d};
+  $('#range').textContent=keys.length?('Available '+fmtK(keys[0])+' - '+fmtK(keys[keys.length-1])):'No dates available';
+  const nk=dkey(cfg.tz,now);
+  let idx=MONTHS.findIndex(([y,m])=>nk.startsWith(y+'-'+p2(m+1)));
+  state.month=idx<0?0:idx;
+  $('#prev').onclick=()=>{if(state.month>0){state.month--;resetPick();drawMonth()}};
+  $('#next').onclick=()=>{if(state.month<MONTHS.length-1){state.month++;resetPick();drawMonth()}};
+  drawMonth();
+}
+
+function resetPick(){
+  state.day=null;state.slot=null;
+  $('#timeWrap').classList.add('hidden');
+  $('#save').disabled=true;
+}
+
+function drawMonth(){
+  const [y,m]=MONTHS[state.month];
+  $('#mtitle').textContent=MNAME[m]+' '+y;
+  $('#prev').disabled=state.month===0;
+  $('#next').disabled=state.month===MONTHS.length-1;
   const g=$('#cal');g.innerHTML='';
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>g.insertAdjacentHTML('beforeend','<div class="dow">'+d+'</div>'));
-  const offset=new Date(2026,10,1).getDay();
+  const offset=new Date(y,m,1).getDay();
+  const total=new Date(y,m+1,0).getDate();
   for(let i=0;i<offset;i++)g.insertAdjacentHTML('beforeend','<div></div>');
-  for(let d=1;d<=30;d++){
-    const ok=d in state.avail;
+  for(let d=1;d<=total;d++){
+    const key=y+'-'+p2(m+1)+'-'+p2(d);
+    const ok=key in state.avail;
     const b=document.createElement('button');b.textContent=d;b.className='d'+(ok?' on':'');b.disabled=!ok;
-    if(ok)b.onclick=()=>{state.day=d;state.slot=null;
+    if(ok)b.onclick=()=>{state.day=key;state.slot=null;
       g.querySelectorAll('.d').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');showTimes();};
     g.appendChild(b);
   }

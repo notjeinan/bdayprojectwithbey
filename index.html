@@ -40,6 +40,8 @@ main{max-width:640px;margin:0 auto;padding:0 18px calc(60px + env(safe-area-inse
 .badge{display:inline-block;margin-top:16px;padding:6px 16px;border-radius:99px;background:var(--accent);color:#fff;font-weight:600;font-size:14px}
 .badge{background:var(--bg);color:var(--h)}
 h2{font-size:26px;margin:40px 0 4px;color:var(--h)}
+main h2{margin-bottom:10px}
+main h2::after{content:"";display:block;width:100%;height:4px;margin-top:6px;border-radius:99px;background:var(--h)}
 .sub{color:var(--pageink);opacity:.8;margin:0 0 18px}
 .tl{display:flex;flex-direction:column;gap:14px}
 .note{margin:16px 0 0;padding:18px 20px;border-radius:22px;background:var(--soft);color:var(--ink);text-align:left}
@@ -64,8 +66,8 @@ h2 .ic{width:1.1em;height:1.1em;vertical-align:-.18em;margin-right:8px}
 .d.on{opacity:1;background:var(--soft);color:var(--ink);cursor:pointer;font-weight:600}
 .d.on:hover{background:var(--s);color:#fff}
 .d.sel,.d.sel:hover{background:var(--p);color:#fff;transform:scale(1.08)}
-.chips{display:flex;gap:10px;margin-top:16px}
-.chip{flex:1;padding:14px 6px;border-radius:18px;border:2px solid var(--p);background:transparent;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.chip{padding:12px 4px;border-radius:18px;border:2px solid var(--p);background:transparent;color:var(--ink);font:inherit;font-size:14.5px;font-weight:600;cursor:pointer}
 .chip.sel{background:var(--p);color:#fff}
 .ny{margin-top:14px;padding:12px 14px;border-radius:16px;background:var(--soft);font-size:15px}
 .ny b{color:var(--p)}
@@ -129,10 +131,10 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
     <span class="av" id="hav"></span>
     <h1 id="hi">Hi!</h1>
     <p>You’re invited to a Digital Birthday Party</p>
-    <span class="badge">2 Hours · Online</span>
+    <span class="badge">Available on Google Meet</span>
   </section>
 
-  <h2><span class="ic" data-src="https://i.imgur.com/XUpEnbJ.png" data-fb=""></span>Rundown</h2>
+  <h2>Rundown</h2>
   <p class="sub">Two hours of pure fun</p>
   <div class="tl">
     <div class="item"><div class="ico"><span class="ic" data-src="https://i.imgur.com/qROUOim.png" data-fb=""></span></div><div><span class="time">Session 1 · 30 min</span><br><b>Mini Games</b><small>Friendly competition, get ready!</small></div></div>
@@ -145,7 +147,7 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
     <span class="txt">The timings above are a rough guide. If we’re having too much fun, a session might run a little longer, so please keep some extra time free.</span>
   </div>
 
-  <h2 id="calendar"><span class="ic" data-src="https://i.imgur.com/VrpkXOd.png" data-fb=""></span>Calendar</h2>
+  <h2 id="calendar">Calendar</h2>
   <p class="sub">Pick the date and time that works best for you</p>
   <div class="card">
     <span class="tz" id="tz"></span>
@@ -159,7 +161,7 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
     <button class="cta" id="save" disabled>Propose this time</button>
   </div>
 
-  <h2><span class="ic" data-src="https://i.imgur.com/lN2Cyvq.png" data-fb=""></span>Discussion</h2>
+  <h2>Discussion</h2>
   <p class="sub" id="chatsub">Propose a time, approve it, or suggest another one</p>
   <div class="card">
     <div id="thread" class="thread"></div>
@@ -180,13 +182,16 @@ footer{text-align:center;color:var(--pageink);margin-top:40px;font-size:14px}
 const $=s=>document.querySelector(s);
 const NAMES={bey:'Bey',jeinan:'Jeinan'};
 const SRC={bey:'https://i.imgur.com/dF4Tj3T.png',jeinan:'https://i.imgur.com/XsoUXR0.png'};
-// Offered slots are fixed in Jakarta time: 07:00 and 08:00 WIB (= 00:00 / 01:00 UTC)
-const UTC_H=[0,1];
+// Jeinan's availability is defined in WITA (UTC+8), in 2-hour blocks:
+// Sat & Sun: 08:00 until midnight. Mon-Fri: 20:00 until midnight.
+const WITA_OFFSET=8;
+const HOURS_WEEKEND=[8,10,12,14,16,18,20,22];
+const HOURS_WEEKDAY=[20,22];
 const CFG={
-  bey:{tz:'America/New_York',name:'New York time (EST)',labels:['7:00 PM EST','8:00 PM EST'],
-       otherTz:'Asia/Jakarta',otherName:'Jakarta',otherSuffix:'WIB',h12:false,otherIcon:'https://i.imgur.com/bxAoW9n.png'},
-  jeinan:{tz:'Asia/Jakarta',name:'Jakarta time (WIB)',labels:['07:00 WIB','08:00 WIB'],
-       otherTz:'America/New_York',otherName:'New York',otherSuffix:'EST',h12:true,otherIcon:'https://i.imgur.com/fzJR7Qs.png'}
+  bey:{tz:'America/New_York',name:'New York time (EST)',own12:true,ownSuffix:'EST',
+       otherTz:'Asia/Makassar',otherName:'Central Indonesia Time',otherSuffix:'WITA',other12:false,otherIcon:'https://i.imgur.com/bxAoW9n.png'},
+  jeinan:{tz:'Asia/Makassar',name:'Central Indonesia Time (WITA)',own12:false,ownSuffix:'WITA',
+       otherTz:'America/New_York',otherName:'New York time',otherSuffix:'EST',other12:true,otherIcon:'https://i.imgur.com/fzJR7Qs.png'}
 };
 let state={who:null,day:null,slot:null,avail:{}};
 
@@ -225,15 +230,35 @@ function enter(c){
 }
 
 function dayIn(tz,dt){return +new Intl.DateTimeFormat('en-US',{timeZone:tz,day:'numeric'}).format(dt)}
+// Time of day, e.g. "08:00" (24h) or "7:00 PM" (12h)
+function tod(tz,ms,h12){
+  const o={timeZone:tz,hour:h12?'numeric':'2-digit',minute:'2-digit'};
+  if(h12)o.hour12=true;else{o.hour12=false;o.hourCycle='h23'}
+  return new Intl.DateTimeFormat('en-US',o).format(new Date(ms));
+}
+// Time range of a 2-hour slot, e.g. "08:00 – 10:00 WITA"
+function rng(tz,ms,h12,suf){return tod(tz,ms,h12)+' – '+tod(tz,ms+7200000,h12)+' '+suf}
 
 function buildCal(){
   const cfg=CFG[state.who];
-  // Jakarta dates 16-30 Nov, mapped to the viewer's own calendar day
+  // Build every slot (WITA blocks), keep only the ones that are still in the future,
+  // then group them by the viewer's own calendar day.
   state.avail={};
-  for(let jd=16;jd<=30;jd++) state.avail[dayIn(cfg.tz,new Date(Date.UTC(2026,10,jd,UTC_H[0])))]=jd;
+  const now=Date.now();
+  for(let jd=1;jd<=30;jd++){
+    const dow=new Date(Date.UTC(2026,10,jd)).getUTCDay();
+    const hours=(dow===0||dow===6)?HOURS_WEEKEND:HOURS_WEEKDAY;
+    for(const h of hours){
+      const ms=Date.UTC(2026,10,jd,h-WITA_OFFSET);
+      if(ms<=now)continue;
+      const d=dayIn(cfg.tz,new Date(ms));
+      (state.avail[d]=state.avail[d]||[]).push(ms);
+    }
+  }
+  for(const k in state.avail)state.avail[k].sort((a,b)=>a-b);
   const days=Object.keys(state.avail).map(Number);
   $('#tz').textContent='Showing '+cfg.name;
-  $('#range').textContent='Nov '+Math.min(...days)+' – '+Math.max(...days)+' available';
+  $('#range').textContent=days.length?('Nov '+Math.min(...days)+' – '+Math.max(...days)+' available'):'No dates available';
   const g=$('#cal');g.innerHTML='';
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>g.insertAdjacentHTML('beforeend','<div class="dow">'+d+'</div>'));
   const offset=new Date(2026,10,1).getDay();
@@ -252,12 +277,13 @@ function showTimes(){
   $('#timeWrap').classList.remove('hidden');$('#ny').classList.add('hidden');
   $('#save').disabled=true;
   const c=$('#chips');c.innerHTML='';
-  cfg.labels.forEach((lab,i)=>{
-    const b=document.createElement('button');b.className='chip';b.textContent=lab;
-    b.onclick=()=>{state.slot=i;c.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
-      const dt=new Date(Date.UTC(2026,10,state.avail[state.day],UTC_H[i]));
-      const txt=new Intl.DateTimeFormat('en-US',{timeZone:cfg.otherTz,weekday:'short',month:'short',day:'numeric',hour:cfg.h12?'numeric':'2-digit',minute:'2-digit',hour12:cfg.h12}).format(dt);
-      const n=$('#ny');n.innerHTML='<span class="ic" data-src="'+cfg.otherIcon+'" data-fb=""></span>'+cfg.otherName+' time ('+cfg.otherSuffix+'): <b>'+txt+'</b>';initIcons(n);n.classList.remove('hidden');
+  state.avail[state.day].forEach(ms=>{
+    const b=document.createElement('button');b.className='chip';b.textContent=rng(cfg.tz,ms,cfg.own12,cfg.ownSuffix);
+    b.onclick=()=>{state.slot=ms;c.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
+      const dt=new Date(ms);
+      const dstr=new Intl.DateTimeFormat('en-US',{timeZone:cfg.otherTz,weekday:'short',month:'short',day:'numeric'}).format(dt);
+      const txt=dstr+' · '+rng(cfg.otherTz,ms,cfg.other12,cfg.otherSuffix);
+      const n=$('#ny');n.innerHTML='<span class="ic" data-src="'+cfg.otherIcon+'" data-fb=""></span>'+cfg.otherName+': <b>'+txt+'</b>';initIcons(n);n.classList.remove('hidden');
       $('#save').disabled=false;};
     c.appendChild(b);
   });
@@ -297,13 +323,12 @@ let msgs=[],lastSig=null;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function fmt(tz,dt,h12,suf){
   const d=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric'}).format(dt);
-  const t=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:h12?'numeric':'2-digit',minute:'2-digit',hour12:h12}).format(dt);
-  return d+' · '+t+' '+suf;
+  return d+' · '+rng(tz,dt.getTime(),h12,suf);
 }
 function timeBlock(iso){
   const dt=new Date(iso);
   return '<div class="tb"><div><span class="lb">New York</span><b>'+fmt('America/New_York',dt,true,'EST')+'</b></div>'
-    +'<div><span class="lb">Jakarta</span><b>'+fmt('Asia/Jakarta',dt,false,'WIB')+'</b></div></div>';
+    +'<div><span class="lb">Central Indonesia Time</span><b>'+fmt('Asia/Makassar',dt,false,'WITA')+'</b></div></div>';
 }
 function status(){
   let last=null;
@@ -371,7 +396,7 @@ function startChat(){
   setInterval(()=>{if(!document.hidden)refresh()},3000);
 }
 $('#save').onclick=async()=>{
-  const utc=new Date(Date.UTC(2026,10,state.avail[state.day],UTC_H[state.slot])).toISOString();
+  const utc=new Date(state.slot).toISOString();
   await post({type:'propose',startUtc:utc,note:$('#pnote').value.trim()});
   $('#pnote').value='';state.slot=null;
   $('#chips').querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
